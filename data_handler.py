@@ -3,6 +3,7 @@ import csv
 import json
 
 def load_existing_data():
+    """Carrega dados existentes de um arquivo CSV."""
     if os.path.exists('dados.csv'):
         with open('dados.csv', 'r', newline='') as csv_file:
             reader = csv.DictReader(csv_file)
@@ -10,6 +11,7 @@ def load_existing_data():
     return {}
 
 def save_data(data):
+    """Salva os dados em um arquivo CSV."""
     with open('dados.csv', 'w', newline='') as csv_file:
         fieldnames = [
             "id", "color", "roll", "created_at", "updated_at", "status",
@@ -22,6 +24,7 @@ def save_data(data):
         writer.writerows(data.values())
 
 def process_message(message):
+    """Processa a mensagem recebida, extraindo e salvando os dados."""
     try:
         if message.startswith("42"):
             data = json.loads(message[2:])
@@ -51,4 +54,4 @@ def process_message(message):
             save_data(existing_data)
 
     except json.JSONDecodeError:
-        pass
+        print("Erro ao decodificar JSON.")  # Adiciona um log de erro
