@@ -1,6 +1,5 @@
 import telebot
 
-# Token do bot
 API_TOKEN = "7277223979:AAFL1497sJw25z6L-rXuH96wzTa6uGZPJhk"  # Substitua pelo seu token do bot
 CHAT_ID = "6045775620"  # Substitua pelo ID correto do grupo ou chat
 

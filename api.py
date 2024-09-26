@@ -10,10 +10,10 @@ def on_error(ws, error):
     """Callback para erros."""
     print(f"Erro: {error}")  # Log de erro
 
-def on_close(ws):
+def on_close(ws, close_status_code, close_msg):
     """Callback para fechamento da conexão."""
     print("Conexão fechada")  # Log de fechamento
-    # Aqui você pode adicionar lógica para tentar reconectar
+    # Você pode adicionar lógica para tentar reconectar aqui, se necessário
 
 def on_open(ws):
     """Callback para conexão aberta."""
@@ -35,5 +35,9 @@ def start_websocket():
                                 on_error=on_error,
                                 on_close=on_close)
 
-    while True:  # Manter o loop rodando
-        ws.run_forever()
+    # Mantém o loop rodando, também lidando com reconexões
+    ws.run_forever()
+
+def fetch_api():
+    """Função para iniciar o WebSocket."""
+    start_websocket()
