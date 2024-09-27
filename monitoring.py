@@ -103,9 +103,15 @@ def fetch_csv_data(file_path):
     with open(file_path, newline='') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
-            roll = int(row['roll'])
-            color = int(row['color'])
-            resultado.append({'roll': roll, 'color': color})
+            roll = row['roll']
+            color = row['color']
+            if roll and color:  # Verifica se ambos os valores não são vazios
+                try:
+                    roll = int(roll)
+                    color = int(color)
+                    resultado.append({'roll': roll, 'color': color})
+                except ValueError:
+                    print(f"Valor inválido encontrado: roll={roll}, color={color}")  # Print de valor inválido
     return resultado
 
 def estrategia(resultado):
