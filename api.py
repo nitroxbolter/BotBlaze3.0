@@ -12,7 +12,6 @@ def on_error(ws, error):
 
 def on_close(ws, close_status_code, close_msg):
     """Callback para fechamento da conexão."""
-    print("Conexão fechada")  # Log de fechamento
     # Você pode adicionar lógica para tentar reconectar aqui, se necessário
 
 def on_open(ws):
@@ -24,7 +23,6 @@ def on_open(ws):
         }
     }])
     ws.send(subscribe_message)
-    print("Inscrito na sala: double_room_1")  # Log de inscrição
 
 def start_websocket():
     """Inicia a conexão websocket e mantém o loop rodando."""

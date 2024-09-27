@@ -1,8 +1,8 @@
 import threading
 import time
+import csv
 from telegram_bot import send_message
-from api import fetch_api
-from patterns import check_patterns  # Importa a função de padrões
+from patterns import check_patterns
 
 # Definições de variáveis globais
 analise_sinal = False
@@ -88,7 +88,7 @@ def start_monitoring():
     print("Monitoramento iniciado.")  # Print de início do monitoramento
     while running:
         try:
-            resultado = fetch_api()
+            resultado = fetch_csv_data('dados.csv')
             if resultado != check_resultado:
                 check_resultado[:] = resultado
                 print(f"Resultado recebido: {resultado}")  # Print dos resultados recebidos
@@ -97,6 +97,16 @@ def start_monitoring():
             send_message(f"Erro ao buscar dados: {e}")
             print(f"Erro ao buscar dados: {e}")  # Print de erro
         time.sleep(5)
+
+def fetch_csv_data(file_path):
+    resultado = []
+    with open(file_path, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            roll = int(row['roll'])
+            color = int(row['color'])
+            resultado.append({'roll': roll, 'color': color})
+    return resultado
 
 def estrategia(resultado):
     global analise_sinal, cor_sinal
