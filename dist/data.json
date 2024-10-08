@@ -1,0 +1,84 @@
+{
+    "results": [
+        {
+            "number": 1,
+            "minute": "03"
+        },
+        {
+            "number": 7,
+            "minute": "03"
+        },
+        {
+            "number": 10,
+            "minute": "02"
+        },
+        {
+            "number": 10,
+            "minute": "02"
+        },
+        {
+            "number": 2,
+            "minute": "01"
+        },
+        {
+            "number": 5,
+            "minute": "01"
+        },
+        {
+            "number": 8,
+            "minute": "00"
+        },
+        {
+            "number": 0,
+            "minute": "00"
+        },
+        {
+            "number": 9,
+            "minute": "59"
+        },
+        {
+            "number": 9,
+            "minute": "59"
+        },
+        {
+            "number": 11,
+            "minute": "58"
+        },
+        {
+            "number": 5,
+            "minute": "58"
+        },
+        {
+            "number": 13,
+            "minute": "57"
+        },
+        {
+            "number": 4,
+            "minute": "57"
+        },
+        {
+            "number": 8,
+            "minute": "56"
+        },
+        {
+            "number": 11,
+            "minute": "56"
+        },
+        {
+            "number": 8,
+            "minute": "55"
+        },
+        {
+            "number": 12,
+            "minute": "55"
+        },
+        {
+            "number": 10,
+            "minute": "54"
+        },
+        {
+            "number": 6,
+            "minute": "54"
+        }
+    ]
+}

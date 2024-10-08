@@ -1,7 +1,7 @@
 import threading
 import time
-import csv
-from telegram_bot import send_message
+from bot_handler import send_message
+from api_handler import fetch_api
 from patterns import check_patterns
 
 # Definições de variáveis globais
@@ -18,14 +18,12 @@ def reset():
     global analise_sinal, entrada
     entrada = 0
     analise_sinal = False
-    print("Sistema resetado.")  # Print de reset
 
 def martingale():
     global entrada
     entrada += 1
     if entrada <= max_gale:
         send_message(f"⚠️ Gale {entrada} ⚠️")
-        print(f"Martingale ativado: Gale {entrada}")  # Print de martingale
     else:
         loss()
         reset()
@@ -34,13 +32,11 @@ def win():
     global win_count
     send_message("✅")
     win_count += 1
-    print("Vitória registrada!")  # Print de vitória
 
 def loss():
     global loss_count
     send_message("❌")
     loss_count += 1
-    print("Derrota registrada.")  # Print de derrota
 
 def enviar_sinal(cor, padrao):
     send_message(f'''
@@ -53,7 +49,7 @@ def enviar_sinal(cor, padrao):
 🦾 Proteger no ⚪️
 
 🐓 2 martingale: (opcional)''')
-    print(f"Sinal enviado: Entrar no {cor} com padrão {padrao}")  # Print do sinal enviado
+
 
 def correcao(results, color):
     if results[0:1] == ['P'] and color == '⚫️':
@@ -70,86 +66,57 @@ def correcao(results, color):
         win()
         reset()
 
-def get_color_from_roll(roll):
-    """Retorna a cor correspondente ao valor do roll."""
-    if 1 <= roll <= 7:
-        return 'V'  # Vermelho
-    elif 8 <= roll <= 14:
-        return 'P'  # Preto
-    elif roll == 0:
-        return 'B'  # Branco
-    else:
-        return None  # Para rolagens fora do intervalo conhecido
-
 def start_monitoring():
     global running
     running = True
     send_message("Sistema iniciado! Prepare-se para os sinais.")
-    print("Monitoramento iniciado.")  # Print de início do monitoramento
     while running:
         try:
-            resultado = fetch_csv_data('dados.csv')
+            resultado = fetch_api()
             if resultado != check_resultado:
                 check_resultado[:] = resultado
-                print(f"Resultado recebido: {resultado}")  # Print dos resultados recebidos
                 estrategia(resultado)
         except Exception as e:
             send_message(f"Erro ao buscar dados: {e}")
-            print(f"Erro ao buscar dados: {e}")  # Print de erro
         time.sleep(5)
 
-def fetch_csv_data(file_path):
-    resultado = []
-    with open(file_path, newline='') as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            roll = row['roll']
-            color = row['color']
-            if roll and color:  # Verifica se ambos os valores não são vazios
-                try:
-                    roll = int(roll)
-                    color = int(color)
-                    resultado.append({'roll': roll, 'color': color})
-                except ValueError:
-                    print(f"Valor inválido encontrado: roll={roll}, color={color}")  # Print de valor inválido
-    return resultado
-
 def estrategia(resultado):
-    global analise_sinal, cor_sinal
+    global analise_sinal, cor_sinal, cores
 
     cores = []  # Inicializa a lista de cores
-    for data in resultado:
-        roll = data.get("roll")  # Captura o valor do roll
-        if roll is not None:  # Verifica se roll não é None
-            try:
-                roll = int(roll)  # Converte o valor para inteiro
-                print(f"Roll recebido: {roll}")  # Print do roll recebido
-                color = get_color_from_roll(roll)  # Converte o roll em cor
-                if color:  # Verifica se a cor é válida
-                    cores.append(color)
-                    print(f"Cor transformada: {color}")  # Print da cor transformada
-                else:
-                    print(f"Cor inválida para o roll: {roll}")  # Print para cor inválida
-            except ValueError:
-                print(f"Valor de roll inválido: {roll}")  # Log para valor inválido
+    for x in resultado:
+        if x >= 1 and x <= 7:
+            color = 'V'  # Verde
+        elif x >= 8 and x <= 14:
+            color = 'P'  # Preto
+        else:
+            color = 'B'  # Branco
+        cores.append(color)
 
     # Exibe apenas as cores
     print(f"Cores geradas: {cores}")  # Exibe as cores geradas no console
 
-    # Chama a função de verificação de padrões
-    analise_sinal, cor_sinal = check_patterns(cores, enviar_sinal, correcao, analise_sinal, cor_sinal)
-
-    # Print para análise de padrão
     if analise_sinal:
-        print(f"Padrão encontrado: {cor_sinal}")  # Print do padrão encontrado
+        correcao(cores, cor_sinal)
     else:
-        print("Nenhum padrão encontrado.")  # Print caso não encontre padrão
+        patterns = {
+            'Samurai': {'pattern': ['V', 'P'], 'name': '🥷🏼Samurai🥷🏼'},
+            'King': {'pattern': ['V', 'P', 'V'], 'name': '👑King👑'},
+        }
+
+        for num, pat in patterns.items():
+            if cores[:len(pat['pattern'])] == pat['pattern']:
+                cor_sinal = '⚫️' if pat['pattern'][0] in ['P', 'V'] else '⚪️'
+                enviar_sinal(cor_sinal, pat['name'])
+                print(f"Sinal enviado: {pat['name']}")  # Exibe mensagem no console
+                analise_sinal = True
+                break
 
 def stop_monitoring():
     global running
     running = False
     send_message(f"🏁 Encerramento da Sessão 🏁\n\n✅ Wins: {win_count}\n❌ Losses: {loss_count}\n\nObrigado por usar nosso serviço! Até a próxima sessão.")
-    print(f"Relatório:\nWins: {win_count}\nLosses: {loss_count}")  # Print do relatório
+    print(f"Relatório:\nWins: {win_count}\nLosses: {loss_count}")
 
 # Para iniciar a monitorização, use o seguinte código:
 if __name__ == "__main__":
