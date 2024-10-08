@@ -1,6 +1,8 @@
 import websocket
 import json
+import threading
 from data_handler import process_message
+import time
 
 def on_message(ws, message):
     """Callback para mensagens recebidas."""
@@ -12,7 +14,9 @@ def on_error(ws, error):
 
 def on_close(ws, close_status_code, close_msg):
     """Callback para fechamento da conexão."""
-    # Você pode adicionar lógica para tentar reconectar aqui, se necessário
+    
+    time.sleep(5)  # Espera antes de tentar reconectar
+    start_websocket()  # Tenta reconectar
 
 def on_open(ws):
     """Callback para conexão aberta."""
@@ -23,6 +27,7 @@ def on_open(ws):
         }
     }])
     ws.send(subscribe_message)
+    
 
 def start_websocket():
     """Inicia a conexão websocket e mantém o loop rodando."""
@@ -33,9 +38,10 @@ def start_websocket():
                                 on_error=on_error,
                                 on_close=on_close)
 
-    # Mantém o loop rodando, também lidando com reconexões
+    # Mantém o loop rodando
     ws.run_forever()
 
 def fetch_api():
-    """Função para iniciar o WebSocket."""
-    start_websocket()
+    """Função para iniciar o WebSocket em uma thread separada."""
+    ws_thread = threading.Thread(target=start_websocket)
+    ws_thread.start()

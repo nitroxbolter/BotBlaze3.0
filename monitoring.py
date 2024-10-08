@@ -1,7 +1,8 @@
 import threading
 import time
+import csv  # Importa a biblioteca CSV para salvar os dados
 from bot_handler import send_message
-from api_handler import fetch_api
+from api import fetch_api
 from patterns import check_patterns
 
 # Definições de variáveis globais
@@ -50,7 +51,6 @@ def enviar_sinal(cor, padrao):
 
 🐓 2 martingale: (opcional)''')
 
-
 def correcao(results, color):
     if results[0:1] == ['P'] and color == '⚫️':
         win()
@@ -66,18 +66,33 @@ def correcao(results, color):
         win()
         reset()
 
+def save_data_to_csv(data):
+    with open('sinais.csv', 'a', newline='') as csvfile:
+        fieldnames = ['id', 'color', 'roll', 'created_at', 'updated_at', 'status',
+                      'room_id', 'total_red_eur_bet', 'total_red_bets_placed',
+                      'total_white_eur_bet', 'total_white_bets_placed',
+                      'total_black_eur_bet', 'total_black_bets_placed']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writerow(data)
+
 def start_monitoring():
     global running
     running = True
     send_message("Sistema iniciado! Prepare-se para os sinais.")
+    
     while running:
         try:
             resultado = fetch_api()
             if resultado != check_resultado:
                 check_resultado[:] = resultado
                 estrategia(resultado)
+
+                # Salvar dados em CSV
+                save_data_to_csv(resultado)  # Aqui você salva os resultados a cada iteração
+
         except Exception as e:
             send_message(f"Erro ao buscar dados: {e}")
+
         time.sleep(5)
 
 def estrategia(resultado):

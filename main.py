@@ -1,9 +1,10 @@
 print("=== Importando Módulos ===")
 import threading
-from monitoring import start_monitoring, stop_monitoring
 import time
-from data_save import start_saving
-import gui  # Importa o arquivo gui.py
+from monitoring import start_monitoring, stop_monitoring
+from data_handler import save_data, load_existing_data  # Se necessário
+from data_handler import start_saving  # Importando a função start_saving
+from api import fetch_api  # Importando a função fetch_api
 
 def main():
     try:
@@ -20,9 +21,9 @@ def main():
         saving_thread.daemon = True  # Permite que o programa feche quando a thread principal termina
         saving_thread.start()
         
-        print("=== Iniciando Interface ===")
-        # Inicia a GUI
-        gui.create_gui()
+        print("=== Iniciando conexão WebSocket ===")
+        # Inicia a conexão WebSocket
+        fetch_api()
         
     except Exception as e:
         print(f"Ocorreu um erro: {e}")
